@@ -1,0 +1,10 @@
+# Created by .ignore support plugin (hsz.mobi)
+
+### Log files
+*.log
+hs_err_pid*
+
+# IntelliJ
+out/
+/.idea
+target/
