@@ -25,8 +25,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 /**
+  * Integration test. assumes there's an unauthenticated running mongod on localhost
+  *
   * Date: 10/18/2018
   * @author Yaron Yamin
+  *
   */
 class MongoDistLockTest extends Specification with Mockito
 {
@@ -43,11 +46,13 @@ class MongoDistLockTest extends Specification with Mockito
   val LockExpirationDurationMillis = 1000
 
   "MongoDistLock accepting non-future returning task" should {
+
+    val TaskExecMsgPrefix = "running synchronized task... no."
+
     "return computation result when lock is open" in {
       Thread.sleep( LockExpirationDurationMillis )
       val result = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
-        () =>
-          println("some synchronized task 1")
+          println(TaskExecMsgPrefix + "  1")
           "I'm done"
       }
       Await.result(result, 3.seconds) === Some("I'm done")
@@ -56,14 +61,12 @@ class MongoDistLockTest extends Specification with Mockito
     "return None when locked" in {
       Thread.sleep(LockExpirationDurationMillis)
       val result = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
-        () =>
-          println("some synchronized task 2")
+          println(TaskExecMsgPrefix + "  2")
           Thread.sleep(LockExpirationDurationMillis/2)
           "I'm done"
       }
       val result2 = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
-        () =>
-          println("some synchronized task 3")
+          println(TaskExecMsgPrefix + "  3")
           "I'm can't get into the lock"
       }
       Await.result(result, 3.seconds) === Some("I'm done")
@@ -73,15 +76,13 @@ class MongoDistLockTest extends Specification with Mockito
     "return result when lock expired" in {
       Thread.sleep(LockExpirationDurationMillis  + 100)
       val result = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS )){
-        () =>
-          println("some synchronized task 4")
+          println(TaskExecMsgPrefix + "  4")
           Thread.sleep(LockExpirationDurationMillis * 2)
           "I'm done"
       }
       Thread.sleep(LockExpirationDurationMillis + 50)
       val result2 = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
-        () =>
-          println("some synchronized task 5")
+          println(TaskExecMsgPrefix + "  5")
           "opened it again"
       }
       Await.result(result, 3.seconds) === Some("I'm done")
@@ -91,17 +92,16 @@ class MongoDistLockTest extends Specification with Mockito
     "return result when task is done" in {
       Thread.sleep(LockExpirationDurationMillis )
       val result = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
-        () =>
-          println("some synchronized task 6")
+          println(TaskExecMsgPrefix + "  6")
           Thread.sleep(LockExpirationDurationMillis/2)
           "I'm done"
       }
       Thread.sleep(LockExpirationDurationMillis/2 +50)
       val result2 = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
-        () =>
-          println("some synchronized task 7")
+          println(TaskExecMsgPrefix + "  7")
           "opened it again"
       }
+      Await.result(result, 3.seconds) === Some("I'm done")
       Await.result(result2, 3.seconds) === Some("opened it again")
     }
   }

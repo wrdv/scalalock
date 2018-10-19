@@ -39,7 +39,6 @@ import scala.util.{Failure, Success, Try}
   * @author Yaron Yamin
   */
 
-
 /**
   * @param mongoDb the persistence store for the lock collection
   * @param locksCollectionName the collection name where locks will be stored
@@ -54,24 +53,23 @@ class MongoDistLock(mongoDb: MongoDatabase,locksCollectionName:String = "lock_re
     val State = "state"
     val ByHost = "byHost"
   }
+  //todo overload with a promise and document
   /**
     * @see com.weirddev.com.weirddev.distlock.api.DistLock#lock
     */
-  override def lock[T : ClassTag](resourceId: String, expire: Duration)(synchronizedTask: () => T): Future[Option[T]] = {
-    //todo overload with a version of lockAsync instead ? or instead document this limitation . can provide the lock future as a param so other async computation types could let it wait for them? re-check the syntax if a param is not required - compare to play cacheApi
+  override def lock[T](resourceId: String, expire: Duration)(synchronizedTask: => T): Future[Option[T]] = {
     findAndModify(resourceId,LockStates.OPEN,LockStates.LOCKED,expire.toSeconds) map {
       case Some(lockRegistry) =>
         log.info("successfully acquired lock "+lockRegistry)
-        val returnValue:T = synchronizedTask()
-        returnValue match {
-          case future:Future[_] =>
-            future onComplete{ _ =>
+        synchronizedTask match {
+          case futureReturnValue:Future[_] =>
+            futureReturnValue onComplete{ _ =>
               findAndModify(resourceId,LockStates.LOCKED,LockStates.OPEN,expire.toSeconds)
             }
-            Some(returnValue)
-          case _ =>
+            Some(futureReturnValue).asInstanceOf[Option[T]]
+          case nonFutureReturnValue:T =>
             findAndModify(resourceId,LockStates.LOCKED,LockStates.OPEN,expire.toSeconds)
-            Some(returnValue)
+            Some(nonFutureReturnValue)
         }
       case None =>
         log.error("could not retrieve lock. aborting execution")
@@ -109,7 +107,7 @@ class MongoDistLock(mongoDb: MongoDatabase,locksCollectionName:String = "lock_re
   protected def handleResponse[T](tracedOperation:String,logException:Boolean = true, traceResponse:Boolean=true): PartialFunction[Try[T],Boolean] /*PartialFunction[Try[T],Future[T]]*/ = {
     //todo refactor to move locking logic out and use this as a persistence repository while masking mongo-scala api
     case Failure(ex) if ex.isInstanceOf[MongoCommandException] && ex.asInstanceOf[MongoCommandException].getErrorCode == DuplicateKeyErrorCode =>
-      log.info(" Lock upsert attempt resulted with duplicate key failure - task could not be acquired")
+      log.info("ignoring mongo duplicate key error for "+tracedOperation)
       false
     case Failure(ex) =>
       val errMsg = tracedOperation + " failed"

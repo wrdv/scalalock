@@ -17,7 +17,6 @@ package com.weirddev.distlock.api
 
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
-import scala.reflect.ClassTag
 
 /**
   * Date: 10/18/2018
@@ -39,7 +38,7 @@ trait DistLock {
     * @return Returns Future[None] in case resouce is locked.
     *         Returns Future[Some[Future[T] ] ]  in case lock was successful, where Future[T] is the computed result of the concurrent task
     */
-  def lock[T: ClassTag](resourceId: String, expire: Duration = Duration.Inf)(synchronizedTask: () => T): Future[Option[T]]
+  def lock[T](resourceId: String, expire: Duration = Duration.Inf)(synchronizedTask: => T): Future[Option[T]]
 
 
 }
