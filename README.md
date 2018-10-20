@@ -1,6 +1,6 @@
 # DistLock
 
-Distributes lock library in scala
+Distributed lock library in scala
 consist of a general sdk + 1 implementation using mongodb as the lock persistence store and depending on [mongo-scala-driver(https://github.com/mongodb/mongo-scala-driver)]
 
 ### Project state
