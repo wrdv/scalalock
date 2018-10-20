@@ -17,8 +17,12 @@ lazy val commonSettings = Seq(
       Some("releases"  at nexus + "/service/local/staging/deploy/maven2")
   },
   credentials += Credentials(Path.userHome / ".sbt" / ".credentials.txt"),
-  pomExtra := //todo add scm details to pom + project docs url
-    <url>http://weirddev.com</url>
+  pomExtra := //todo update project docs url
+    <url>https://github.com/wrdv/distlock</url>
+    <scm>
+      <url>git@github.com:wrdv/distlock.git</url>
+      <connection>scm:git:git@github.com:wrdv/distlock.git</connection>
+    </scm>
     <licenses>
       <license>
         <name>Apache 2</name>
