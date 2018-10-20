@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weirddev.distlock.api
+package com.weirddev.distlock.mongo
 
-import scala.concurrent.Future
-import scala.concurrent.duration.Duration
+import org.mongodb.scala.MongoDatabase
+
+import scala.concurrent.ExecutionContext
 
 /**
-  * Date: 19/10/2018
+  * Date: 10/18/2018
+  * @param mongoDb the persistence store for the lock collection
+  * @param locksCollectionName the collection name where locks will be stored
   *
   * @author Yaron Yamin
   */
-trait LockRepository {
-  def tryToLock[T](resourceId: String, expire: Duration): Future[Boolean]
-  def releaseLock[T](resourceId: String, expire: Duration): Future[Boolean]
-}
+class MongoDistLock(mongoDb: MongoDatabase,locksCollectionName:String = "lock_registry")(implicit ec: ExecutionContext) extends DistLock(new MongoDistLockRepository(mongoDb,locksCollectionName)(ec))(ec)

@@ -20,7 +20,6 @@ import java.util.Date
 
 import com.mongodb.client.model.ReturnDocument
 import com.mongodb.{MongoCommandException, WriteConcern}
-import com.weirddev.distlock.api.LockRepository
 import com.weirddev.distlock.mongo.LockStates.LockState
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY

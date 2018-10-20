@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weirddev.distlock.api
+package com.weirddev.distlock.mongo
 
 import org.slf4j.{Logger, LoggerFactory}
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Date: 19/10/2018
@@ -30,7 +30,7 @@ class DistLock(lockRepository:LockRepository)(implicit ec: ExecutionContext) ext
   private val log: Logger = LoggerFactory.getLogger(getClass)
 
   /**
-    * @see com.weirddev.com.weirddev.distlock.api.DistLock#lock
+    * @see com.weirddev.distlock.api.DistLock#lock
     */
   override def lock[T](resourceId: String, expire: Duration)(synchronizedTask: => T): Future[Option[T]] = {
     lockRepository.tryToLock(resourceId, expire) map {
