@@ -1,12 +1,38 @@
 name := "distlock"
-organization := "com.weirddev.scala"
-version := "1.0.1"
 
-//resolvers +=  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
-
-lazy val settings = Seq(
+lazy val commonSettings = Seq(
+  organization := "com.weirddev",
+  organizationName := "WeirdDev",
+  organizationHomepage := Some(url("http://weirddev.com")),
+  version := "1.0.1",
   scalaVersion := "2.12.7",
+  //  crossScalaVersions := Seq(/*"2.10.7",*/"2.11.12", "2.12.7"), //2.11 has compatibility issue with transform not accepting Try mapper func
   scalacOptions in Test ++= Seq("-Yrangepos"),
+  description := "Distributed Lock library in scala. currently supported persistence stores: mongodb - depending on mongo-scala-driver",
+  publishTo := {
+    val nexus = "https://oss.sonatype.org"
+    if (isSnapshot.value)
+      Some("snapshots" at nexus + "/content/repositories/snapshots")
+    else
+      Some("releases"  at nexus + "/service/local/staging/deploy/maven2")
+  },
+  credentials += Credentials(Path.userHome / ".sbt" / ".credentials.txt"),
+  pomExtra := //todo add scm details to pom + project docs url
+//    <url>http://weirddev.com</url>
+    <licenses>
+      <license>
+        <name>Apache 2</name>
+        <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+    <developers>
+      <developer>
+        <name>Yaron Yamin</name>
+        <organization>WeirdDev</organization>
+        <url>https://github.com/yaronyam</url>
+      </developer>
+    </developers>,
 
 ) ++ Defaults.itSettings
 
@@ -20,18 +46,22 @@ lazy val commonDependencies  = Seq(
 
 lazy val distlock = project
   .in(file("."))
+  .settings(
+    packagedArtifacts := Map(),
+    skip in publish := true
+  )
   .aggregate(`distlock-api`,`distlock-mongo`)
 
 val `distlock-api` = project
   .configs(IntegrationTest)
-  .settings(settings,
+  .settings(commonSettings,
     libraryDependencies ++= commonDependencies
   )
 
 val `distlock-mongo` = project
   .configs(IntegrationTest)
   .dependsOn(`distlock-api`)
-  .settings(settings,
+  .settings(commonSettings,
     libraryDependencies ++= commonDependencies ++ Seq(
       "org.mongodb.scala" %% "mongo-scala-driver" % "2.4.2",
     )
