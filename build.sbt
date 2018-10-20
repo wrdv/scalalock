@@ -18,7 +18,7 @@ lazy val commonSettings = Seq(
   },
   credentials += Credentials(Path.userHome / ".sbt" / ".credentials.txt"),
   pomExtra := //todo add scm details to pom + project docs url
-//    <url>http://weirddev.com</url>
+    <url>http://weirddev.com</url>
     <licenses>
       <license>
         <name>Apache 2</name>
@@ -48,7 +48,7 @@ lazy val distlock = project
   .in(file("."))
   .settings(
     packagedArtifacts := Map(),
-    skip in publish := true
+    skip in publish := true,
   )
   .aggregate(`distlock-api`,`distlock-mongo`)
 
