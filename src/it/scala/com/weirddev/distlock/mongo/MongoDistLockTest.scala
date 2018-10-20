@@ -17,10 +17,11 @@ package com.weirddev.distlock.mongo
 
 import com.mongodb.ConnectionString
 import org.mongodb.scala.{MongoClient, MongoClientSettings, MongoDatabase}
+import org.specs2.matcher.MatchResult
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
@@ -105,8 +106,81 @@ class MongoDistLockTest extends Specification with Mockito
       Await.result(result2, 3.seconds) === Some("opened it again")
     }
   }
+  "MongoDistLock accepting a future returning task" should {
 
-// todo: "MongoDistLock accepting a future returning task" should {}
+    val TaskExecMsgPrefix = "running a future synchronized task ... no."
+
+    "return computation result when lock is open" in {
+      Thread.sleep( LockExpirationDurationMillis )
+      val result: Future[Option[Future[String]]] = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
+        Future {
+          println(TaskExecMsgPrefix + "  1")
+          Thread.sleep(400)
+          "I'm done"
+        }
+      }
+      assertFutureResult(result, "I'm done")
+    }
+
+    "return None when locked" in {
+      Thread.sleep(LockExpirationDurationMillis)
+      val result = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
+        Future {
+          println(TaskExecMsgPrefix + "  2")
+          Thread.sleep(LockExpirationDurationMillis/2)
+          "I'm done"
+        }
+      }
+      val result2 = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
+          println(TaskExecMsgPrefix + "  3")
+          "I'm can't get into the lock"
+      }
+      assertFutureResult(result, "I'm done")
+      Await.result(result2, 3.seconds) === None
+    }
+
+    "return result when lock expired" in {
+      Thread.sleep(LockExpirationDurationMillis  + 100)
+      val result = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS )){
+        Future {
+          println(TaskExecMsgPrefix + "  4")
+          Thread.sleep(LockExpirationDurationMillis * 2)
+          "I'm done"
+        }
+      }
+      Thread.sleep(LockExpirationDurationMillis + 50)
+      val result2 = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
+          println(TaskExecMsgPrefix + "  5")
+          "opened it again"
+      }
+      assertFutureResult(result, "I'm done")
+      Await.result(result2, 3.seconds) === Some("opened it again")
+    }
+
+    "return result when task is done" in {
+      Thread.sleep(LockExpirationDurationMillis )
+      val result = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
+        Future{
+          println(TaskExecMsgPrefix + "  6")
+          Thread.sleep(LockExpirationDurationMillis/2)
+          "I'm done"
+        }
+      }
+      Thread.sleep(LockExpirationDurationMillis/2 +50)
+      val result2 = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
+          println(TaskExecMsgPrefix + "  7")
+          "opened it again"
+      }
+      assertFutureResult(result, "I'm done")
+      Await.result(result2, 3.seconds) === Some("opened it again")
+    }
+  }
+
+  private def assertFutureResult(result: Future[Option[Future[String]]], expectedResult: String): MatchResult[String] = {
+    val maybeEventualString = Await.result(result, 3.seconds)
+    maybeEventualString.isInstanceOf[Some[Future[String]]] === true
+    Await.result(maybeEventualString.get, 3.seconds) === expectedResult
+  }
 }
 
 //Generated with love by TestMe :) Please report issues and submit feature requests at: http://weirddev.com/forum#!/testme
