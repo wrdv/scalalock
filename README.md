@@ -3,8 +3,8 @@
 Distributed lock library in scala
 
 consist of a 2 modules:
-- distlock-api - contains the api and the locking logic
-- distlock-mongo - an api implementation using mongodb as lock persistence store. implementation is dependant on [mongo-scala-driver(https://github.com/mongodb/mongo-scala-driver)]
+- _distlock-api_ - contains the api and the locking logic
+- _distlock-mongo_ - an api implementation using mongodb as lock persistence store. implementation is dependant on [mongo-scala-driver(https://github.com/mongodb/mongo-scala-driver)]
 
 
 ### Project state
