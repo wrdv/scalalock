@@ -1,4 +1,4 @@
-package com.weirddev.distlock.mongo
+package com.weirddev.distlock.api
 
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration

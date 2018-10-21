@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weirddev.distlock.mongo
+package com.weirddev.distlock
 
 import com.mongodb.ConnectionString
+import com.weirddev.distlock.mongo.MongoDistLock
 import org.mongodb.scala.{MongoClient, MongoClientSettings, MongoDatabase}
 import org.specs2.matcher.MatchResult
 import org.specs2.mock.Mockito

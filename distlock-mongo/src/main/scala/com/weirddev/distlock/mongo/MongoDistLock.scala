@@ -15,6 +15,7 @@
  */
 package com.weirddev.distlock.mongo
 
+import com.weirddev.distlock.api.DistLock
 import org.mongodb.scala.MongoDatabase
 
 import scala.concurrent.ExecutionContext

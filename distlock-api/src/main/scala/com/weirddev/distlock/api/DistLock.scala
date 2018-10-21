@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weirddev.distlock.mongo
+package com.weirddev.distlock.api
 
 import org.slf4j.{Logger, LoggerFactory}
 
