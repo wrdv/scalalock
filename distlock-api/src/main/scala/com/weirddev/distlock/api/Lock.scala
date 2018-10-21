@@ -19,11 +19,10 @@ trait Lock {
     *               useful when task is stuck for longer than anticipated or when there's a system crash.
     *               since the lock is persisted, it will not unlock on restart in jvm crash scenario unless there an expiration period set.
     * @param synchronizedTask The synchronized function to invoke if locking was successful.
+    * @param taskId Task name of auditing. sometimes the same resource is accessed by different task types ( i.e. publisher/consumer)
     * @return Returns Future[None] in case resouce is locked.
     *         Returns Future[Some[Future[T] ] ]  in case lock was successful, where Future[T] is the computed result of the concurrent task
     */
-  def lock[T](resourceId: String, expire: Duration = Duration.Inf)(synchronizedTask: => T): Future[Option[T]]
-
-  //todo overload with a promise and document
+  def lock[T](resourceId: String, expire: Duration = Duration.Inf, taskId:Option[String]=None)(synchronizedTask: => T): Future[Option[T]]
 
 }

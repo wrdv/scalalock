@@ -160,7 +160,7 @@ class MongoDistLockTest extends Specification with Mockito
 
     "return result when task is done" in {
       Thread.sleep(LockExpirationDurationMillis )
-      val result = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
+      val result = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS),Some("task returning a future")){
         Future{
           println(TaskExecMsgPrefix + "  6")
           Thread.sleep(LockExpirationDurationMillis/2)

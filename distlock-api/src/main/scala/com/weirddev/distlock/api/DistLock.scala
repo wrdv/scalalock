@@ -30,12 +30,13 @@ class DistLock(lockRepository:LockRepository)(implicit ec: ExecutionContext) ext
   private val log: Logger = LoggerFactory.getLogger(getClass)
 
   /**
-    * @see com.weirddev.distlock.api.DistLock#lock
+    * @see com.weirddev.distlock.api.Lock#lock
     */
-  override def lock[T](resourceId: String, expire: Duration)(synchronizedTask: => T): Future[Option[T]] = {
+  override def lock[T](resourceId: String, expire: Duration= Duration.Inf, taskId:Option[String]=None)(synchronizedTask: => T): Future[Option[T]] = {
+    val resourceDetailsLogMsg = s"for resource '$resourceId'${taskId.map(" by task '" + _+"'").getOrElse("")}"
     lockRepository.tryToLock(resourceId, expire) map {
       case true =>
-        log.info("successfully acquired lock")
+        log.info(s"successfully acquired lock "+resourceDetailsLogMsg)
         synchronizedTask match {
           case futureReturnValue:Future[_] =>
             futureReturnValue onComplete{ _ =>
@@ -47,7 +48,7 @@ class DistLock(lockRepository:LockRepository)(implicit ec: ExecutionContext) ext
             Some(nonFutureReturnValue)
         }
       case false =>
-        log.error("could not retrieve lock. aborting execution")
+        log.info(s"could not acquire lock $resourceDetailsLogMsg. aborting execution")
         None
     }
   }
