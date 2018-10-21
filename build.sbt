@@ -17,27 +17,23 @@ lazy val commonSettings = Seq(
       Some("releases"  at nexus + "/service/local/staging/deploy/maven2")
   },
   credentials += Credentials(Path.userHome / ".sbt" / ".credentials.txt"),
-  pomExtra := //todo update project docs url
-    <url>https://github.com/wrdv/distlock</url>
-    <scm>
-      <url>git@github.com:wrdv/distlock.git</url>
-      <connection>scm:git:git@github.com:wrdv/distlock.git</connection>
-    </scm>
-    <licenses>
-      <license>
-        <name>Apache 2</name>
-        <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        <distribution>repo</distribution>
-      </license>
-    </licenses>
-    <developers>
-      <developer>
-        <name>Yaron Yamin</name>
-        <organization>WeirdDev</organization>
-        <url>https://github.com/yaronyam</url>
-      </developer>
-    </developers>,
-
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/wrdv/distlock"),
+      "scm:git@github.com:wrdv/distlock.git"
+    )
+  ),
+  licenses := List("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt")),
+  homepage := Some(url("https://github.com/wrdv/distlock")), //todo update project docs url
+  developers := List(
+    Developer(
+      id    = "yaronyam",
+      name  = "Yaron Yamin",
+      email = "yarony@weirddev.com",
+      url   = url("https://github.com/yaronyam")
+    )
+  ),
+  publishMavenStyle := true,
 ) ++ Defaults.itSettings
 
 lazy val commonDependencies  = Seq(
@@ -51,7 +47,6 @@ lazy val commonDependencies  = Seq(
 lazy val distlock = project
   .in(file("."))
   .settings(
-    packagedArtifacts := Map(),
     skip in publish := true,
   )
   .aggregate(`distlock-api`,`distlock-mongo`)
