@@ -7,10 +7,7 @@ consist of a 2 modules:
 - _distlock-mongo_ - an api implementation using mongodb as the lock persistence store. implementation is dependant on [mongo-scala-driver](https://github.com/mongodb/mongo-scala-driver).
 
 
-### Project state
-beta
-
-## Usage
+### Usage
 
 1. Add dependencies to `build.sbt`:
 
