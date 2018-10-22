@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weirddev.distlock
+package com.weirddev.distlock.mongo
 
 import com.mongodb.ConnectionString
-import com.weirddev.distlock.mongo.MongoDistLock
 import org.mongodb.scala.{MongoClient, MongoClientSettings, MongoDatabase}
 import org.specs2.matcher.MatchResult
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 /**
   * Integration test. assumes there's an unauthenticated running mongod on localhost
@@ -33,7 +32,7 @@ import scala.concurrent.duration._
   * @author Yaron Yamin
   *
   */
-class MongoDistLockTest extends Specification with Mockito
+class MongoDistLockITest extends Specification with Mockito
 {
   sequential
 
@@ -168,7 +167,7 @@ class MongoDistLockTest extends Specification with Mockito
         }
       }
       Thread.sleep(LockExpirationDurationMillis/2 +50)
-      val result2 = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
+      val result2 = mongoDistLock.lock("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS),Some("a 2nd task returning a future")){
           println(TaskExecMsgPrefix + "  7")
           "opened it again"
       }

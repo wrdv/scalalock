@@ -32,19 +32,19 @@ class DistLock(lockRepository:LockRepository)(implicit ec: ExecutionContext) ext
   /**
     * @see com.weirddev.distlock.api.Lock#lock
     */
-  override def lock[T](resourceId: String, expire: Duration= Duration.Inf, taskId:Option[String]=None)(synchronizedTask: => T): Future[Option[T]] = {
-    val resourceDetailsLogMsg = s"for resource '$resourceId'${taskId.map(" by task '" + _+"'").getOrElse("")}"
-    lockRepository.tryToLock(resourceId, expire) map {
+  override def lock[T](resourceId: String, expire: Duration= Duration.Inf, optTaskId:Option[String]=None)(synchronizedTask: => T): Future[Option[T]] = {
+    val resourceDetailsLogMsg = s"for resource '$resourceId'${optTaskId.map(" by task '" + _+"'").getOrElse("")}"
+    lockRepository.tryToLock(resourceId, expire,optTaskId) map {
       case true =>
         log.info(s"successfully acquired lock "+resourceDetailsLogMsg)
         synchronizedTask match {
           case futureReturnValue:Future[_] =>
             futureReturnValue onComplete{ _ =>
-              lockRepository.releaseLock(resourceId, expire)
+              lockRepository.releaseLock(resourceId, expire,optTaskId)
             }
             Some(futureReturnValue).asInstanceOf[Option[T]]
           case nonFutureReturnValue  =>
-            lockRepository.releaseLock(resourceId, expire)
+            lockRepository.releaseLock(resourceId, expire,optTaskId)
             Some(nonFutureReturnValue)
         }
       case false =>

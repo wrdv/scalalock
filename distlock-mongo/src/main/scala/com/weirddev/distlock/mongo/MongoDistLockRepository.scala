@@ -50,18 +50,19 @@ protected class MongoDistLockRepository(mongoDb: MongoDatabase,locksCollectionNa
     val RegisteredAt = "registeredAt"
     val State = "state"
     val ByHost = "byHost"
+    val TaskId = "taskId"
   }
 
   protected val LockRegistryColl: MongoCollection[LockRegistry] = mongoDb.getCollection[LockRegistry](locksCollectionName).withCodecRegistry(
     fromRegistries(fromProviders(classOf[LockRegistry]), DEFAULT_CODEC_REGISTRY)).withWriteConcern(WriteConcern.ACKNOWLEDGED
   )
 
-  override def releaseLock[T](resourceId: String, expire: Duration): Future[Boolean] = {
-    findAndModify(resourceId, LockStates.LOCKED, LockStates.OPEN, expire.toSeconds) transform transformDaoResponse
+  override def releaseLock[T](resourceId: String, expire: Duration, optTaskId: Option[String]): Future[Boolean] = {
+    findAndModify(resourceId, LockStates.LOCKED, LockStates.OPEN, expire.toSeconds, optTaskId) transform transformDaoResponse
   }
 
-  override def tryToLock[T](resourceId: String, expire: Duration): Future[Boolean] = {
-    findAndModify(resourceId, LockStates.OPEN, LockStates.LOCKED, expire.toSeconds) transform transformDaoResponse
+  override def tryToLock[T](resourceId: String, expire: Duration, optTaskId: Option[String]): Future[Boolean] = {
+    findAndModify(resourceId, LockStates.OPEN, LockStates.LOCKED, expire.toSeconds, optTaskId) transform transformDaoResponse
   }
 
   protected def transformDaoResponse[T]: Try[T]=>Try[Boolean] = {
@@ -74,7 +75,7 @@ protected class MongoDistLockRepository(mongoDb: MongoDatabase,locksCollectionNa
       Failure(ex)
   }
 
-  protected def findAndModify(resourceId:String, fromState: LockState, toState: LockState, secondsAgo:Long): Future[Option[LockRegistry]]  = {
+  protected def findAndModify(resourceId:String, fromState: LockState, toState: LockState, secondsAgo:Long, optTaskId: Option[String]): Future[Option[LockRegistry]]  = {
     log.info(s"trying to find a lock registry document by _id=$resourceId in state=$fromState or with registeredAt < (sysdate - $secondsAgo seconds ago )")
     LockRegistryColl.findOneAndUpdate(
       Filters.and(
@@ -87,7 +88,8 @@ protected class MongoDistLockRepository(mongoDb: MongoDatabase,locksCollectionNa
       Updates.combine(
         Updates.currentDate(LockRegistryFieldName.RegisteredAt),
         Updates.set(LockRegistryFieldName.State,toState.toString),
-        Updates.set(LockRegistryFieldName.ByHost,InetAddress.getLocalHost.getHostName)
+        Updates.set(LockRegistryFieldName.ByHost,InetAddress.getLocalHost.getHostName),
+        Updates.set(LockRegistryFieldName.TaskId, optTaskId.orNull)
       ),
       FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)
     )

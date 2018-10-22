@@ -21,7 +21,7 @@ import java.util.Date
   * Date: 10/18/2018
   * @author Yaron Yamin
   */
-case class LockRegistry(_id:String, registeredAt:Date, state:String, byHost:String)
+case class LockRegistry(_id:String, registeredAt:Date, state:String, byHost:String, taskId: Option[String])
 
 object LockStates extends Enumeration {
   type LockState = Value

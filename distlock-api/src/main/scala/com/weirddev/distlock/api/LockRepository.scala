@@ -9,6 +9,6 @@ import scala.concurrent.duration.Duration
   * @author Yaron Yamin
   */
 trait LockRepository {
-  def tryToLock[T](resourceId: String, expire: Duration): Future[Boolean]
-  def releaseLock[T](resourceId: String, expire: Duration): Future[Boolean]
+  def tryToLock[T](resourceId: String, expire: Duration, optTaskId: Option[String]): Future[Boolean]
+  def releaseLock[T](resourceId: String, expire: Duration, optTaskId: Option[String]): Future[Boolean]
 }
