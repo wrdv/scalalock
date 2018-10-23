@@ -1,4 +1,4 @@
-name := "distlock"
+name := "scalalock"
 
 lazy val commonSettings = Seq(
   organization := "com.weirddev",
@@ -19,12 +19,12 @@ lazy val commonSettings = Seq(
   credentials += Credentials(Path.userHome / ".sbt" / ".credentials.txt"),
   scmInfo := Some(
     ScmInfo(
-      url("https://github.com/wrdv/distlock"),
-      "scm:git@github.com:wrdv/distlock.git"
+      url("https://github.com/wrdv/scalalock"),
+      "scm:git@github.com:wrdv/scalalock.git"
     )
   ),
   licenses := List("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt")),
-  homepage := Some(url("https://github.com/wrdv/distlock")), //todo update project docs url
+  homepage := Some(url("https://github.com/wrdv/scalalock")), //todo update project docs url
   developers := List(
     Developer(
       id    = "yaronyam",
@@ -44,22 +44,22 @@ lazy val commonDependencies  = Seq(
   "org.specs2" %% "specs2-mock" % "4.3.4" % "test,it",
 )
 
-lazy val distlock = project
+lazy val scalalock = project
   .in(file("."))
   .settings(
     skip in publish := true,
   )
-  .aggregate(`distlock-api`,`distlock-mongo`)
+  .aggregate(`scalalock-api`,`scalalock-mongo`)
 
-val `distlock-api` = project
+val `scalalock-api` = project
   .configs(IntegrationTest)
   .settings(commonSettings,
     libraryDependencies ++= commonDependencies
   )
 
-val `distlock-mongo` = project
+val `scalalock-mongo` = project
   .configs(IntegrationTest)
-  .dependsOn(`distlock-api`)
+  .dependsOn(`scalalock-api`)
   .settings(commonSettings,
     libraryDependencies ++= commonDependencies ++ Seq(
       "org.mongodb.scala" %% "mongo-scala-driver" % "2.4.2",

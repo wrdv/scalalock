@@ -1,4 +1,4 @@
-## Contributing to DistLock
+## Contributing to Scalalock
 
 Contributions are welcomed :)
 Unless your intended contribution bares minor effort - it is highly recommended to post an issue/feature requests here on github first to get some feedback and perhaps trigger a discussion with other interested developers.
