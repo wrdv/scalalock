@@ -13,8 +13,8 @@ consist of a 2 modules:
 
     ```scala
     libraryDependencies ++= Seq(
-      "com.weirddev" %% "scalalock-api" % "1.0.3",
-      "com.weirddev" %% "scalalock-mongo" % "1.0.3"
+      "com.weirddev" %% "scalalock-api" % "1.0.4",
+      "com.weirddev" %% "scalalock-mongo" % "1.0.4"
     )
     ```
 
