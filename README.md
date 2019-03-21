@@ -2,7 +2,7 @@
 
 Distributed lock library in scala. based on mongodb (using [mongo-scala-driver](https://github.com/mongodb/mongo-scala-driver) )
 
-consist of a 2 modules:
+consist of 2 modules:
 - _scalalock-api_ - contains the api and the locking logic
 - _scalalock-mongo_ - an api implementation using mongodb as the lock persistence store. implementation is dependant on [mongo-scala-driver](https://github.com/mongodb/mongo-scala-driver).
 
