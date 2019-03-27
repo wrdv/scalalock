@@ -67,10 +67,9 @@ val `scalalock-mongo` = project
   )
 val `scalalock-reactivemongo` = project
   .configs(IntegrationTest)
-  .dependsOn(`scalalock-api`)
+  .dependsOn(`scalalock-api` % "compile->compile;test->test;it->it")
   .settings(commonSettings,
     libraryDependencies ++= commonDependencies ++ Seq(
       "org.reactivemongo" %% "reactivemongo" % "0.16.0",
-//      "org.reactivemongo" % "reactivemongo-shaded-native" % "0.1x-linux-x86-64" % "runtime"
     )
   )
