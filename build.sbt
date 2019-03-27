@@ -4,7 +4,7 @@ lazy val commonSettings = Seq(
   organization := "com.weirddev",
   organizationName := "WeirdDev",
   organizationHomepage := Some(url("http://weirddev.com")),
-  version := "1.0.4",
+  version := "1.0.5",
   scalaVersion := "2.12.7",
   //  crossScalaVersions := Seq(/*"2.10.7",*/"2.11.12", "2.12.7"), //2.11 has compatibility issue with transform not accepting Try mapper func
   scalacOptions in Test ++= Seq("-Yrangepos"),
@@ -24,7 +24,7 @@ lazy val commonSettings = Seq(
     )
   ),
   licenses := List("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt")),
-  homepage := Some(url("https://github.com/wrdv/scalalock")), //todo update project docs url
+  homepage := Some(url("https://github.com/wrdv/scalalock")),
   developers := List(
     Developer(
       id    = "yaronyam",
@@ -49,7 +49,7 @@ lazy val scalalock = project
   .settings(
     skip in publish := true,
   )
-  .aggregate(`scalalock-api`,`scalalock-mongo`)
+  .aggregate(`scalalock-api`,`scalalock-mongo`,`scalalock-reactivemongo`)
 
 val `scalalock-api` = project
   .configs(IntegrationTest)
@@ -59,9 +59,18 @@ val `scalalock-api` = project
 
 val `scalalock-mongo` = project
   .configs(IntegrationTest)
-  .dependsOn(`scalalock-api`)
+  .dependsOn(`scalalock-api`  % "compile->compile;test->test;it->it")
   .settings(commonSettings,
     libraryDependencies ++= commonDependencies ++ Seq(
       "org.mongodb.scala" %% "mongo-scala-driver" % "2.4.2",
+    )
+  )
+val `scalalock-reactivemongo` = project
+  .configs(IntegrationTest)
+  .dependsOn(`scalalock-api`)
+  .settings(commonSettings,
+    libraryDependencies ++= commonDependencies ++ Seq(
+      "org.reactivemongo" %% "reactivemongo" % "0.16.0",
+//      "org.reactivemongo" % "reactivemongo-shaded-native" % "0.1x-linux-x86-64" % "runtime"
     )
   )

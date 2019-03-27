@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weirddev.scalalock.mongo
+package com.weirddev.scalalock.model
 
 import java.util.Date
 
@@ -23,7 +23,19 @@ import java.util.Date
   */
 case class LockRegistry(_id:String, registeredAt:Date, state:String, byHost:String, taskId: Option[String])
 
+object LockRegistry {
+  val DefaultCollectionName = "lock_registry"
+}
+
 object LockStates extends Enumeration {
   type LockState = Value
   val LOCKED,OPEN = Value
+}
+
+object LockRegistryFieldName{
+  val Id = "_id"
+  val RegisteredAt = "registeredAt"
+  val State = "state"
+  val ByHost = "byHost"
+  val TaskId = "taskId"
 }
