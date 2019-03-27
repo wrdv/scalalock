@@ -93,6 +93,21 @@ abstract class AbstractMongoDistributedLockTest extends Specification with Mocki
       Await.result(result, 3.seconds) === Some("I'm done")
       Await.result(result2, 3.seconds) === Some("opened it again")
     }
+    "keep lock is releaseLockWhenDone is set to false" in {
+      Thread.sleep(LockExpirationDurationMillis )
+      val result = mongoDistLock.acquire("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS),releaseLockWhenDone = false){
+        println(TaskExecMsgPrefix + "  6B")
+        Thread.sleep(LockExpirationDurationMillis/2)
+        "I'm done"
+      }
+      Thread.sleep(LockExpirationDurationMillis/2 +50)
+      val result2 = mongoDistLock.acquire("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS)){
+        println(TaskExecMsgPrefix + "  7B")
+        "should not be able to open"
+      }
+      Await.result(result, 3.seconds) === Some("I'm done")
+      Await.result(result2, 3.seconds) === None
+    }
   }
   "MongoDistributedLock accepting a future returning task" should {
 
@@ -147,7 +162,7 @@ abstract class AbstractMongoDistributedLockTest extends Specification with Mocki
 
     "return result when task is done" in {
       Thread.sleep(LockExpirationDurationMillis )
-      val result = mongoDistLock.acquire("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS),Some("task returning a future")){
+      val result = mongoDistLock.acquire("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS),releaseLockWhenDone = true,Some("task returning a future")){
         Future{
           println(TaskExecMsgPrefix + "  6")
           Thread.sleep(LockExpirationDurationMillis/2)
@@ -155,12 +170,29 @@ abstract class AbstractMongoDistributedLockTest extends Specification with Mocki
         }
       }
       Thread.sleep(LockExpirationDurationMillis/2 +50)
-      val result2 = mongoDistLock.acquire("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS),Some("a 2nd task returning a future")){
+      val result2 = mongoDistLock.acquire("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS),releaseLockWhenDone = true,Some("a 2nd task returning a future")){
         println(TaskExecMsgPrefix + "  7")
         "opened it again"
       }
       assertFutureResult(result, "I'm done")
       Await.result(result2, 3.seconds) === Some("opened it again")
+    }
+    "keep lock is releaseLockWhenDone is set to false" in {
+      Thread.sleep(LockExpirationDurationMillis )
+      val result = mongoDistLock.acquire("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS),releaseLockWhenDone = false,Some("task returning a future")){
+        Future{
+          println(TaskExecMsgPrefix + "  8")
+          Thread.sleep(LockExpirationDurationMillis/2)
+          "I'm done"
+        }
+      }
+      Thread.sleep(LockExpirationDurationMillis/2 +50)
+      val result2 = mongoDistLock.acquire("test_task", Duration(LockExpirationDurationMillis,MILLISECONDS),releaseLockWhenDone = true,Some("a 2nd task returning a future")){
+        println(TaskExecMsgPrefix + "  7")
+        "should not be able to open"
+      }
+      assertFutureResult(result, "I'm done")
+      Await.result(result2, 3.seconds) === None
     }
   }
 

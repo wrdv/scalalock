@@ -101,7 +101,17 @@ consists of 3 modules:
     }
     ```
 
-3. For other usage scenarios, review the [integrative test code](https://github.com/wrdv/scalalock/blob/master/scalalock-mongo/src/it/scala/com/weirddev/scalalock/MongoDistributedLockTest.scala)
+3. If you want to use the lock to synchronize task execution globally in a cluster and mandating a minimal interval - pass the `releaseLockWhenDone` as `false`. 
+    This will keep the lock state as LOCKED even after task completion. Effectively keeping the lock until expiration - as set by the `expire` param.
+    example:
+    ```scala
+      val result = mongoDistLock.acquire(resourceId =  "test_task", expire = 30 minutes,releaseLockWhenDone = false){
+          println("After this block finishes to execute, the lock will retain for 30 minutes before any other task using resource id - test_task - could run again")
+          Thread.sleep(5000)
+           "Done"
+      }
+    ```          
+    For other usage scenarios, review the [integrative test code](https://github.com/wrdv/scalalock/blob/master/scalalock-api/src/it/scala/com/weirddev/scalalock/mongo/AbstractMongoDistributedLockTest.scala)
 
 ### Contributing/Developing
 Welcomed :) - Please refer to [`CONTRIBUTING.md`](./CONTRIBUTING.md) file.
