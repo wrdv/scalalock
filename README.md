@@ -14,15 +14,15 @@ consists of 3 modules:
   - Option A - if you're using [mongo-scala-driver](https://github.com/mongodb/mongo-scala-driver) 
     ```scala
     libraryDependencies ++= Seq(
-      "com.weirddev" %% "scalalock-api" % "1.0.5",
-      "com.weirddev" %% "scalalock-mongo" % "1.0.5"
+      "com.weirddev" %% "scalalock-api" % "1.0.6",
+      "com.weirddev" %% "scalalock-mongo" % "1.0.6"
     )
     ```
   - Option B - if you're using [reactivemongo](https://github.com/ReactiveMongo/ReactiveMongo) 
     ```scala
     libraryDependencies ++= Seq(
-      "com.weirddev" %% "scalalock-api" % "1.0.5",
-      "com.weirddev" %% "scalalock-reactivemongo" % "1.0.5"
+      "com.weirddev" %% "scalalock-api" % "1.0.6",
+      "com.weirddev" %% "scalalock-reactivemongo" % "1.0.6"
     )
     ```
 
