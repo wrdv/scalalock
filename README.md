@@ -1,6 +1,6 @@
 # Scalalock [![Maven Central](https://img.shields.io/maven-central/v/com.weirddev/scalalock-api_2.12.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:com.weirddev%20AND%20a:scalalock-api_2.12)
 
-Distributed lock library in scala. based on mongodb (using [mongo-scala-driver](https://github.com/mongodb/mongo-scala-driver) )
+Distributed lock library in scala. based on mongodb (using [reactivemongo](https://github.com/ReactiveMongo/ReactiveMongo) or [mongo-scala-driver](https://github.com/mongodb/mongo-scala-driver))
 
 consists of 3 modules:
 - _scalalock-api_ - contains the api and the locking logic
