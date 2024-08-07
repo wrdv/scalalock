@@ -19,7 +19,7 @@ package com.weirddev.scalalock.reactivemongo
 
 import com.weirddev.scalalock.api.DistributedLock
 import com.weirddev.scalalock.model.LockRegistry
-import reactivemongo.api.DefaultDB
+import reactivemongo.api.DB
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,4 +29,4 @@ import scala.concurrent.{ExecutionContext, Future}
   * @param locksCollectionName the collection name where locks will be stored
   * @author Yaron Yamin
   */
-class ReactiveMongoDistributedLock(database: Future[DefaultDB], locksCollectionName:String = LockRegistry.DefaultCollectionName)(implicit ec: ExecutionContext) extends DistributedLock(new ReactiveMongoDistributedLockRepository(database,locksCollectionName)(ec))(ec)
+class ReactiveMongoDistributedLock(database: Future[DB], locksCollectionName:String = LockRegistry.DefaultCollectionName)(implicit ec: ExecutionContext) extends DistributedLock(new ReactiveMongoDistributedLockRepository(database,locksCollectionName)(ec))(ec)

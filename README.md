@@ -22,7 +22,8 @@ consists of 3 modules:
     ```scala
     libraryDependencies ++= Seq(
       "com.weirddev" %% "scalalock-api" % "1.0.6",
-      "com.weirddev" %% "scalalock-reactivemongo" % "1.0.6"
+      "com.weirddev" %% "scalalock-reactivemongo" % "1.1.0" //for reactivemongo 1.*
+//      "com.weirddev" %% "scalalock-reactivemongo" % "1.0.6" //for reactivemongo 0.*
     )
     ```
 
@@ -117,5 +118,5 @@ consists of 3 modules:
 Welcomed :) - Please refer to [`CONTRIBUTING.md`](./CONTRIBUTING.md) file.
 
 ### License
-Copyright (c) 2016 - 2019  [WeirdDev](http://weirddev.com).
+Copyright (c) 2016 - 2024  [WeirdDev](http://weirddev.com).
 Licensed for free usage under the terms and conditions of Apache V2 - [Apache V2 License](https://www.apache.org/licenses/LICENSE-2.0).

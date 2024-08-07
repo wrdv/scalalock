@@ -19,7 +19,7 @@ package com.weirddev.scalalock.reactivemongo
 
 import com.weirddev.scalalock.mongo.AbstractMongoDistributedLockTest
 import org.specs2.specification.AfterAll
-import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
+import reactivemongo.api.{AsyncDriver, DB, MongoConnection}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -29,28 +29,23 @@ import scala.concurrent.Future
   *
   * @author Yaron Yamin
   */
-class ReactiveMongoDistributedLockTest extends AbstractMongoDistributedLockTest with AfterAll
-{
+class ReactiveMongoDistributedLockTest extends AbstractMongoDistributedLockTest with AfterAll {
   sequential
-
+  isolated
   private val mongoUri: String = "mongodb://localhost:27017/test"
-  val driver = new MongoDriver
-  val database: Future[DefaultDB] = for {
-    uri <- Future.fromTry(MongoConnection.parseURI(mongoUri))
-    con = driver.connection(uri)
-    dn <- Future(uri.db.get)
-    db <- con.database(dn)
+  private val driver = AsyncDriver()
+  val database: Future[DB] = for {
+    uri <- MongoConnection.fromString(mongoUri)
+    con <- driver.connect(uri, uri.db)
+    db <- con.database(uri.db.get)
   } yield db
 
   val mongoDistLock = new ReactiveMongoDistributedLock(database, "test_lock_registry2")
 
-  def afterAll(): Unit ={
-      database map {
-        resolution =>
-          println(s"DB resolution: $resolution")
-          println(s"Closing connection....")
-          driver.close()
-      }
+  def afterAll(): Unit = {
+    database.map { _ =>
+      println(s"Closing connection....")
+      driver.close()
+    }
   }
 }
-
