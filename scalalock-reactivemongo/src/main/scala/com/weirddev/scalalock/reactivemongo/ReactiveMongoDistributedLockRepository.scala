@@ -40,6 +40,10 @@ class ReactiveMongoDistributedLockRepository(database: Future[DB], locksCollecti
   protected def lockRegistryColl: Future[BSONCollection] = database.map(_.collection(locksCollectionName))
 
   protected def findAndModify(resourceId: String, fromState: LockState, toState: LockState, secondsAgo: Long, optTaskId: Option[String]): Future[Option[LockRegistry]] = {
+    implicit def dateReader: BSONReader[Date] =
+      implicitly[BSONReader[java.time.Instant]].afterRead { i =>
+        new Date(i.toEpochMilli)
+      }
     implicit val reader: BSONDocumentReader[LockRegistry] = Macros.reader[LockRegistry]
     lockRegistryColl.flatMap { collection =>
       val selector = BSONDocument(
