@@ -1,5 +1,5 @@
 name := "scalalock"
-
+val ScalalockReactivemongoVersion = "1.1.0"
 lazy val commonSettings = Seq(
   organization := "com.weirddev",
   organizationName := "WeirdDev",
@@ -34,6 +34,8 @@ lazy val commonSettings = Seq(
     )
   ),
   publishMavenStyle := true,
+  pomIncludeRepository := { _ => false },
+  updateOptions := updateOptions.value.withGigahorse(false),
 ) ++ Defaults.itSettings
 
 lazy val commonDependencies  = Seq(
@@ -68,8 +70,8 @@ val `scalalock-mongo` = project
 val `scalalock-reactivemongo` = project
   .configs(IntegrationTest)
   .dependsOn(`scalalock-api` % "compile->compile;test->test;it->it")
-  .settings(commonSettings,
+  .settings(commonSettings ++ Seq(version := ScalalockReactivemongoVersion),
     libraryDependencies ++= commonDependencies ++ Seq(
-      "org.reactivemongo" %% "reactivemongo" % "0.16.0",
+      "org.reactivemongo" %% "reactivemongo" % "1.1.0-RC12",
     )
   )
