@@ -34,6 +34,8 @@ lazy val commonSettings = Seq(
     )
   ),
   publishMavenStyle := true,
+  pomIncludeRepository := { _ => false },
+  updateOptions := updateOptions.value.withGigahorse(false),
 ) ++ Defaults.itSettings
 
 lazy val commonDependencies  = Seq(

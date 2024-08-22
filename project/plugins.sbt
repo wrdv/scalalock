@@ -1,2 +1,2 @@
 
-addSbtPlugin("io.crashbox" % "sbt-gpg" % "0.2.0")
+addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.1.2")
